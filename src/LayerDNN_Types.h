@@ -40,7 +40,7 @@ inline void ErrorWarning(const char* aFunctionName,
 
 
 typedef long unsigned int counter_t;
-typedef float number_t;
+typedef double number_t;
 typedef std::vector<number_t> TR1; //1d array (rank 1 tensor, but not strictly a tensor)
 typedef std::vector<std::vector<number_t> > TR2;//2d array (rank 2 tensor, but not strictly a tensor)
 typedef std::vector<std::vector<std::vector<number_t> > > TR3;//3d array (rank 3 tensor, but not strictly a tensor)

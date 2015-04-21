@@ -1,16 +1,16 @@
 
-#include "NLayer.h" //abstract base class
-#include "INLayer.h"//input layer
-#include "FNLayer.h"//fully connected layer
-#include "ONLayer.h"//output layer (has targets in LayerData)
-#include "LNLayer.h"//Local receptive field layer
-#include "CNLayer.h"//convolution layer
-#include "PNLayer.h"//pooling layer
-#include "VLayerGroup.h"//vertical group of layers
-#include "ALayerGroup.h"
-#include "CPVLayerGroup.h"
+#include "../src/NLayer.h" //abstract base class
+#include "../src/INLayer.h"//input layer
+#include "../src/FNLayer.h"//fully connected layer
+#include "../src/ONLayer.h"//output layer (has targets in LayerData)
+#include "../src/LNLayer.h"//Local receptive field layer
+#include "../src/CNLayer.h"//convolution layer
+#include "../src/PNLayer.h"//pooling layer
+#include "../src/VLayerGroup.h"//vertical group of layers
+#include "../src/ALayerGroup.h"
+#include "../src/CPVLayerGroup.h"
 
-#include "LayerTrainer.h"
+#include "../src/LayerTrainer.h"
 
 #include <sstream>
 #include <thread>
@@ -184,14 +184,6 @@ void LoadIrisDataLN(string filename, TR3 &training, counter_t &nInput, counter_t
 //Does momentum work?
 //Does LearningRateGain in LayerData work?
 //Does the L2 regularization work?
-//CNN are just a special case of local receptive field layers (make that a base class from which CNN inherits)
-
-//!!Don't think that delta is back propped correctly from an aggregating layer; the input layer should not sum over
-//!!the neurons in the aggregating layer. It should just grab the delta and update DeltaW with --> could this
-//!!be solved using convo pars???
-
-//!! Should decide when to run initialize_layer_data(), since it cannot always run in the constructor (e.g. LayerGroup)
-//!! and it needs to run before a print() or before a forward_pass() - maybe add a flag to initialize it only once?
 
 int main(int argc, char* argv[]){
 
@@ -272,7 +264,7 @@ int main(int argc, char* argv[]){
   LayerTrainer Trainer2(&vlg);
   Trainer2.set_classif_threshold(0.9);
   Trainer2.set_target_classif_rate(0.998);
-  Trainer2.set_nmax_epochs(1000);
+  Trainer2.set_nmax_epochs(100);
   Trainer2.train_mini_batches(trainingLN,trainingLN,50);
 
   ofstream ofile("vlg_trained.dat");
@@ -284,8 +276,7 @@ int main(int argc, char* argv[]){
   VLayerGroup vgfile;
   ifile>>vgfile;
   vgfile.forward_pass(testX);
-
-  vgfile.print();
+  vgfile.get_last_layer()->print();
 /*
   //Local receptive field
   counter_t nSpan=8,nOverlap=0;

@@ -14,6 +14,9 @@ ONLayer::ONLayer(counter_t anInput, counter_t anOutput, number_t aInputBias,
 
 {
   fLayerType=kOutputLayer;
+  fActivationType=kLogisticActivation;//default
+  fCostFunctionType=kQuadraticCost;//default, works more often!
+
   fnNeuron=anOutput;
   fnInput=anInput;
   fInputBias=aInputBias;
@@ -34,8 +37,6 @@ void ONLayer::initialize(bool aForce)
   fnOutput=fnNeuron;
   fnWeight=fnInput;
   if(fInputBias>0.)fnWeight++;
-  fActivationType=kLogisticActivation;//default
-  fCostFunctionType=kQuadraticCost;//default, works more often!
 
   initialize_layer_data();
   fInitialized=true;

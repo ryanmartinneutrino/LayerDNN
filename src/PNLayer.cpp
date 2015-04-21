@@ -9,9 +9,12 @@ PNLayer::PNLayer(counter_t anPool, counter_t anInput, std::string aLayerID):
   NLayer(aLayerID)
 {
   fLayerType=kPoolingLayer;
+  fActivationType=kUninitializedActivation;//default
   if( (anInput % anPool)!=0)ERROR("Pooling factor must be an exact factor of nInput");
   fnInput=anInput;
   fConvoPars.span=anPool;//use convo pars for the pooling layer to span its input layer
+
+
   initialize();
 }
 
@@ -28,9 +31,6 @@ void PNLayer::initialize(bool aForce)
   fnNeuron=fnInput/fConvoPars.span;
   fnOutput=fnNeuron;
   fnWeight=fConvoPars.span;
-
-  if(fInputBias>0.)fnWeight++;
-  fActivationType=kUninitializedActivation;//default
   initialize_layer_data();
   fInitialized=true;
 }

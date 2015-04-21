@@ -19,6 +19,7 @@ LNLayer::LNLayer(counter_t anSpan, counter_t anOverlap, counter_t anInput, numbe
   if(anOverlap!=0)ERROR("Non-zero overlap not currently supported");
 
   fLayerType=kLocalReceptiveFieldLayer;
+  fActivationType=kLogisticActivation;//default
   fnInput=anInput;
   fConvoPars.span=anSpan;
   fConvoPars.overlap=anOverlap;
@@ -54,7 +55,7 @@ void LNLayer::initialize(bool aForce)
   fnOutput=fnNeuron;
   fnWeight=fConvoPars.span;
   if(fInputBias>0.)fnWeight++;
-  fActivationType=kLogisticActivation;//default
+
 
   initialize_layer_data();
   fInitialized=true;

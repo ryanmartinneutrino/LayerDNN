@@ -14,6 +14,8 @@ FNLayer::FNLayer(counter_t anInput, counter_t anNeuron, number_t aInputBias,
          NLayer(aLayerID)
 {
   fLayerType=kFullConnectedLayer;
+  fActivationType=kLogisticActivation;//default
+
   fnNeuron=anNeuron;
   fInputBias=aInputBias;
   fnInput=anInput;
@@ -33,7 +35,7 @@ void FNLayer::initialize(bool aForce)
   fnOutput=fnNeuron;
   fnWeight=fnInput;
   if(fInputBias>0.)fnWeight++;
-  fActivationType=kLogisticActivation;//default
+
   initialize_layer_data();
   fInitialized=true;
 }
