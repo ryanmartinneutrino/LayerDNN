@@ -8,7 +8,6 @@
 #include <stdlib.h>
 
 
-
 class NLayer
 {
 //This is a general class to manage a layer in a deep neural network. All the data for the layer
@@ -19,11 +18,7 @@ class NLayer
     NLayer(std::string aLayerID="noid");
     virtual ~NLayer();
 
-    //!! This method must be updated when new derived classes are created:
-    static NLayer* BuildNewLayer(LayerType aType);
-    static std::string LayerType2String(LayerType aType);
-
-
+    //for streaming NLayers
     friend std::ostream& operator<<(std::ostream& aOStream, NLayer* aL);
     friend std::ostream& operator<<(std::ostream& aOStream, NLayer& aL){
       aOStream<<(&aL);
@@ -38,7 +33,7 @@ class NLayer
     virtual void print(counter_t aDataIndex=0);
 
 
-    //!!Methods that inherited classes should implement (make these pure virtual?)
+    //!!Methods that inherited classes need to implement:
     //initialize data members to the specific values for inherited classes (e.g. input layer has no neurons)
     virtual void initialize(bool aForce=false)=0;
     //initialize the layer data to be the right size:
@@ -49,7 +44,6 @@ class NLayer
     virtual void update_weights()=0;
 
     //for LayerGroup derived classes and aggregating layer
-    //virtual void initialize_pointers(){};
     virtual void copy_targets(const TR2 &aY=TR2(0), counter_t aStart=0, counter_t anData=0){};
     virtual void add_layer(NLayer* aLayer){
       fLayer.push_back(aLayer);
@@ -59,10 +53,11 @@ class NLayer
     //for output layer derived classes:
     virtual number_t get_cost(){return -1.0;}
     virtual number_t get_classification_success_rate(number_t aThreshold=0.){return -1.0;}
+
+    //Note that some getters and setters are overwritten in derived classes (in particular those
+    //that set prev and next layer pointers and ranges)
     //Getters
     virtual LayerData* get_layer_data_ptr(){return fLayerData;}
-
-
     virtual counter_t get_ninput(){return fnInput;}
     virtual counter_t get_noutput(){return fnOutput;}
     virtual counter_t get_nneuron(){return fnNeuron;}
@@ -91,12 +86,7 @@ class NLayer
     virtual number_t get_momentum_alpha(){return fMomentumAlpha;}
     virtual number_t get_L2_regularization(){return fL2Reg;}
     virtual TR2 get_all_output_data(){return fLayerData->fOutput;}
-
-    virtual std::string get_layer_type_str(LayerType aType=kUninitializedLayer){
-      if(aType==kUninitializedLayer)return LayerType2String(fLayerType);
-      else return LayerType2String(aType);
-    }
-
+    virtual std::string get_layer_type_str(LayerType aType=kUninitializedLayer);
     virtual std::string get_activation_type_str(){
       switch(fActivationType){
         case kUninitializedActivation:
@@ -111,7 +101,6 @@ class NLayer
           return "Unknown";
       }
     }
-
     virtual std::string get_cost_function_type_str(){
       switch(fCostFunctionType){
         case kUninitializedCost:
@@ -125,6 +114,7 @@ class NLayer
       }
     }
     //Setters
+    virtual void set_layer_ID(std::string aID){fLayerID=aID;}
     virtual void set_layer_type(LayerType aType){fLayerType=aType;}
     virtual void set_activation_type(ActivationType aType){fActivationType=aType;}
     virtual void set_cost_function_type(CostFunctionType aType){fCostFunctionType=aType;}
@@ -137,8 +127,6 @@ class NLayer
     virtual void set_prev_layer_range(counter_t aFirst=0, counter_t aLast=0){
       fPrevLayerRange.first=aFirst;
       fPrevLayerRange.last=aLast;}
-    //void set_next_layer_first(counter_t aStart=0){fNextLayerRange.first=aStart;}
-    //void set_next_layer_last(counter_t aEnd=0){fNextLayerRange.last=aEnd;}
     virtual void set_global_learning_rate(number_t aRate){fGlobalLearningRate=aRate;}
     virtual void multiply_global_learning_rate(number_t aFact=1.0){fGlobalLearningRate*=aFact;}
     virtual void add_to_global_learning_rate(number_t a=0.0){fGlobalLearningRate+=a;}
@@ -185,6 +173,5 @@ class NLayer
     counter_t fInstanceCount;//count instances of a class
 };
 
-//counter_t NLayer::fInstanceCount=0;
 
 #endif // __NLAYER_H__

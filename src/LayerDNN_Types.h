@@ -77,17 +77,23 @@ inline std::istream & operator>>(std::istream & aIS, ConvoPars &aR) {
   return aIS;
 }
 ////////////////
-//!!New layer types should be added here, and in NLayer::get_layer_type_str() and NLayer::BuildNewLayer()
-
+//!!New layer types should be added here, and in LayerRegister.cpp!!!
 enum LayerType{kUninitializedLayer, kInputLayer, kFullConnectedLayer,kOutputLayer,
                kLocalReceptiveFieldLayer, kConvolutionLayer, kPoolingLayer,
                kUninitializedLayerGroup, kVerticalLayerGroup, kAggregatingLayerGroup,
                kConvoPoolVLayerGroup};
 
+//for being able to read a LayerType from a stream
+inline std::istream & operator>>(std::istream & argIS, LayerType & aLayerType) {
+  //for streaming an enum
+  unsigned int nt = 0;
+  argIS >> nt;
+  aLayerType = static_cast<LayerType>(nt);
+  return argIS;
+}
+
 enum ActivationType{kUninitializedActivation,kLogisticActivation,kReLUActivation,kSoftMaxActivation};
 enum CostFunctionType{kUninitializedCost, kQuadraticCost, kXCorrelCost};
-
-
 
 inline std::istream & operator>>(std::istream & aIS, ActivationType & aActivationType) {
   //for streaming an enum
@@ -105,14 +111,6 @@ inline std::istream & operator>>(std::istream & aIS, CostFunctionType & aCostFun
   return aIS;
 }
 
-//for being able to read a LayerType from a stream
-inline std::istream & operator>>(std::istream & argIS, LayerType & aLayerType) {
-  //for streaming an enum
-  unsigned int nt = 0;
-  argIS >> nt;
-  aLayerType = static_cast<LayerType>(nt);
-  return argIS;
-}
 
 
 

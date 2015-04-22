@@ -1,4 +1,4 @@
-#include "NLayer.h"
+/*#include "NLayer.h"
 #include "ONLayer.h"
 #include "FNLayer.h"
 #include "INLayer.h"
@@ -9,7 +9,9 @@
 #include "VLayerGroup.h"
 #include "ALayerGroup.h"
 #include "CPVLayerGroup.h"
-//#include "HLayerGroup.h"
+//#include "HLayerGroup.h"*/
+
+#include "LayerRegister.h"
 
 #include "Random.h"
 #include <iostream>
@@ -102,7 +104,7 @@ std::istream& operator>>(std::istream& aIStream, NLayer* aL)
     LayerType type;
     for(counter_t ilayer=0;ilayer<aL->fnLayer;ilayer++){
       aIStream>>type;
-      aL->fLayer[ilayer]=NLayer::BuildNewLayer(type);
+      aL->fLayer[ilayer]=LayerRegister::BuildNewLayer(type);
       if(aL->fLayer[ilayer]==NULL){
         WARN("Trying to load null layer");
         continue;
@@ -135,7 +137,6 @@ void NLayer::print(counter_t aDataIndex){
         <<endl;
   }
 
-
   //print out layer data if this is not a layer group:
   if(fLayerData!=NULL && fnLayer==0)fLayerData->print(aDataIndex);
 }
@@ -147,65 +148,7 @@ std::string NLayer::get_new_layer_id()
   return get_layer_type_str()+"_"+ss.str();
 }
 
-std::string NLayer::LayerType2String(LayerType aType){
-  switch(aType){
-    case kUninitializedLayer:
-      return "Uninitialized";
-    case kInputLayer:
-      return "Input";
-    case kFullConnectedLayer:
-      return "FullyConnected";
-    case kOutputLayer:
-      return "Output";
-    case kLocalReceptiveFieldLayer:
-      return "LocalReceptiveField";
-    case kConvolutionLayer:
-      return "Convolution";
-    case kPoolingLayer:
-      return "Pooling";
-    case kUninitializedLayerGroup:
-      return "UninitializedLayerGroup";
-    case kVerticalLayerGroup:
-      return "VerticalLayerGroup";
-    case kAggregatingLayerGroup:
-      return "AggregatingLayerGroup";
-    case kConvoPoolVLayerGroup:
-      return "ConvoPoolingVLayerGroup";
-    //case kHorizontalLayerGroup:
-      //return "Horizontal Layer Group";
-    default:
-      return "Unknown";
-  }
+std::string NLayer::get_layer_type_str(LayerType aType){
+  if(aType==kUninitializedLayer)return LayerRegister::LayerType2String(fLayerType);
+  else return LayerRegister::LayerType2String(aType);
 }
-
-NLayer* NLayer::BuildNewLayer(LayerType aType){
-  switch(aType){
-    case kUninitializedLayer:
-      return NULL;
-    case kInputLayer:
-      return new INLayer();
-    case kFullConnectedLayer:
-      return new FNLayer();
-    case kOutputLayer:
-      return new ONLayer();
-    case kLocalReceptiveFieldLayer:
-      return new LNLayer();
-    case kConvolutionLayer:
-      return new CNLayer();
-    case kPoolingLayer:
-      return new PNLayer();
-    case kAggregatingLayerGroup:
-      return new ALayerGroup();
-    case kUninitializedLayerGroup:
-      return NULL;
-    case kVerticalLayerGroup:
-      return new VLayerGroup();
-    case kConvoPoolVLayerGroup:
-      return new CPVLayerGroup();
-    //case kHorizontalLayerGroup:
-      //return new HLayerGroup();
-    default:
-      return NULL;
-  }
-}
-
