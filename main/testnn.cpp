@@ -1,16 +1,17 @@
 
-#include "../src/NLayer.h" //abstract base class
-#include "../src/INLayer.h"//input layer
-#include "../src/FNLayer.h"//fully connected layer
-#include "../src/ONLayer.h"//output layer (has targets in LayerData)
-#include "../src/LNLayer.h"//Local receptive field layer
-#include "../src/CNLayer.h"//convolution layer
-#include "../src/PNLayer.h"//pooling layer
-#include "../src/VLayerGroup.h"//vertical group of layers
-#include "../src/ALayerGroup.h"
-#include "../src/CPVLayerGroup.h"
+#include <NLayer.h> //abstract base class
+#include <INLayer.h>//input layer
+#include <FNLayer.h>//fully connected layer
+#include <ONLayer.h>//output layer (has targets in LayerData)
+#include <LNLayer.h>//Local receptive field layer
+#include <CNLayer.h>//convolution layer
+#include <PNLayer.h>//pooling layer
+#include <VLayerGroup.h>//vertical group of layers
+#include <ALayerGroup.h>
+#include <CPVLayerGroup.h>
 
-#include "../src/LayerTrainer.h"
+
+#include <LayerTrainer.h>
 
 #include <sstream>
 #include <thread>
