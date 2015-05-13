@@ -22,7 +22,7 @@ LDFLAGS  = -fPIC
 SOFLAGS  = -shared
 
 ALLINC= -Isrc/
-ALLLIB= -lfftw3 -lm -lgmpxx -lgmp
+ALLLIB=
 
 EXESRC := $(wildcard main/*.$(SrcSuf))
 EXEOBJ := $(EXESRC:.cpp=.o)
@@ -32,23 +32,20 @@ SRC := $(wildcard src/*.cpp)
 OBJ := $(SRC:.cpp=.o)
 
 #This is the name of the library that will be built:
-LIBRARY = liblayerdnn.so
+LIBRARY = lib/liblayerdnn.so
 
 all : $(OBJ) $(EXEOBJ) dynamiclib $(EXE)  
-
 
 %.$(ObjSuf): %.$(SrcSuf)
 	$(CXX) -c $(ALLINC) $(CXXFLAGS) $< -o $@ 
 
 %$(ExeSuf): main/%.$(ObjSuf)
 	@echo linking executable
-	$(LD) $(LDFLAGS) $< -o $@ $(ALLLIB) $(HOME)/usr/lib/$(LIBRARY) 
-	cp $@ $(HOME)/usr/bin/.
+	$(LD) $(LDFLAGS) $< -o $@ $(ALLLIB) $(LIBRARY) 
 
 dynamiclib: $(OBJ) $(HEADERFILES) 
 	@echo "Generating library $(LIBRARY)..."
 	$(LD) $(SOFLAGS) $(LDFLAGS) $(OBJ) -o $(LIBRARY)
-	#cp $(LIBRARY) $(HOME)/usr/lib/.
 
 .PHONY : clean
 
