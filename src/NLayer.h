@@ -134,7 +134,7 @@ class NLayer
     virtual void set_L2_regularization(number_t aL2){fL2Reg=aL2;}
 
   protected:
-    std::string fLayerID;//Unique layer ID, not used for now
+    std::string fLayerID;//Unique layer ID, could be used to get layers in memory
     bool fInitialized=false;
 
     counter_t fnNeuron;
