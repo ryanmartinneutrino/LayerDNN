@@ -92,7 +92,7 @@ inline std::istream & operator>>(std::istream & argIS, LayerType & aLayerType) {
   return argIS;
 }
 
-enum ActivationType{kUninitializedActivation,kLogisticActivation,kReLUActivation,kSoftMaxActivation};
+enum ActivationType{kUninitializedActivation,kLogisticActivation,kReLUActivation,kSoftMaxActivation,kTanhActivation};
 enum CostFunctionType{kUninitializedCost, kQuadraticCost, kXCorrelCost};
 
 inline std::istream & operator>>(std::istream & aIS, ActivationType & aActivationType) {

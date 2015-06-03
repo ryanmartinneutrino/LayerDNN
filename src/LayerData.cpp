@@ -271,6 +271,10 @@ void LayerData::feed_forward(const LayerData &aPrevLayer, ActivationType aType)
         case(kLogisticActivation):
           fOutput[idata][ineuron]=1./(1.+exp(-fZ[idata][ineuron]));//logistic
           break;
+        case(kTanhActivation):
+          fOutput[idata][ineuron]=(exp(fZ[idata][ineuron])-exp(-fZ[idata][ineuron]))
+                                  /(exp(fZ[idata][ineuron])+exp(-fZ[idata][ineuron]));//logistic
+          break;
         case(kReLUActivation):
           fOutput[idata][ineuron]=( fZ[idata][ineuron]>0 ? fZ[idata][ineuron] : 0 );//Rectified Linear Unit
           break;
@@ -452,6 +456,9 @@ void LayerData::delta_from_next_layer(const LayerData &aPrevLayer, const LayerDa
       //Derivative of ReLU is 1, no need to multiply delta by 1
       if(aType==kLogisticActivation || aType==kSoftMaxActivation){
         fDelta[idata][ineuron]*=fOutput[idata][ineuron]*(1.-fOutput[idata][ineuron]);//logistic and softmax derivative
+      }
+      if(aType==kTanhActivation){
+        fDelta[idata][ineuron]*=(1.-fOutput[idata][ineuron]*fOutput[idata][ineuron]);//derivative of tanh
       }
 
       //Update the delta W and sum that into the AvgDeltaW.
