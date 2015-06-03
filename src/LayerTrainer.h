@@ -29,7 +29,8 @@ class LayerTrainer
     void set_increase_LR_term(number_t aF=0.){fIncreaseLRFactor=aF;}
     void set_classif_rate_change(number_t aR=0.){fClassifRateChange=aR;}
     void set_cost_change(number_t aR=0.){fCostChange=aR;}
-    void set_target_classif_rate(number_t aR=0.99){fTargetClassifRate=aR;}
+    void set_target_classif_rate(number_t aR=0.99){fTargetClassifRate=aR;fTargetCost=-1.0;}
+    void set_target_cost(number_t aC=0.01){fTargetCost=aC;fTargetClassifRate=-1.0;}
 
   protected:
     NLayer* fLayer;//layer to be trained
@@ -41,6 +42,7 @@ class LayerTrainer
     number_t fIncreaseLRTerm;//term to reduce learning rate
     number_t fClassifRateChange;//if classification rate has changed by less than this relative amount, do something
     number_t fCostChange;
+    number_t fTargetCost;//use only targetCost OR targetClassifRate (the one not being used should be -1)
     number_t fTargetClassifRate;
 
   private:

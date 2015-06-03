@@ -11,7 +11,7 @@ LayerTrainer::LayerTrainer(NLayer* aLayer):
               fClassifThreshold(0.5),
               fReduceLRFactor(0.95),fIncreaseLRFactor(1.),fReduceLRTerm(0.),fIncreaseLRTerm(0.05),
               fClassifRateChange(0.01),fCostChange(0.01),
-              fTargetClassifRate(0.999)
+              fTargetCost(-1.0),fTargetClassifRate(-1.0)
 {
   //ctor
 }
@@ -59,6 +59,17 @@ void LayerTrainer::train_mini_batches(TR3 &aTraining, const TR3 &aValidation,
       <<"with "<<aTraining[0].size()<<" data with mini batches of "<<anPerBatch<<endl;
   cout<<"Cost function type: "<<fLayer->get_last_layer()->get_cost_function_type_str().c_str()<<endl;
 
+  if(fTargetCost<0. && fTargetClassifRate<0.){
+    cout<<"Defaulting to using targe classification rate of 0.999";
+    fTargetClassifRate=0.999;
+  }
+  else if(fTargetCost<0){
+    cout<<"Using target classification rate of "<<fTargetClassifRate<<endl;
+  }
+  else{
+    cout<<"Using target cost of "<<fTargetCost<<endl;
+  }
+
   number_t cost=0.;
   number_t prevCost=0.;
   number_t classificationRate=1.;
@@ -80,15 +91,49 @@ void LayerTrainer::train_mini_batches(TR3 &aTraining, const TR3 &aValidation,
       fLayer->forward_pass(aValidation[0]);
       fLayer->copy_targets(aValidation[1]);
 
-      //calculate metrics
-      cost=fLayer->get_cost();
-      classificationRate=fLayer->get_classification_success_rate(fClassifThreshold);
-      //how often to print progress
-      if(i % (fnMaxEpoch/20)==0){
-        cout<<"Epoch "<<i<<" of "<<fnMaxEpoch<<" cost: "<<cost
-            <<" classif rate: "<<classificationRate<<endl;
+      //calculate metrics and adjust learning rate
+      //!!need to be careful with increasing or decreasing the learning rate, it can explode!
+      if(fTargetCost<0){//use classification rate maximization
+        classificationRate=fLayer->get_classification_success_rate(fClassifThreshold);
+        //decrease learning rate if classification got worse
+        if(classificationRate<prevclassificationRate){
+          fLayer->multiply_global_learning_rate(fReduceLRFactor);
+        }
+        //If classification rate has not changed by more than 1%
+        else if(fabs(classificationRate-prevclassificationRate)/classificationRate <fClassifRateChange){
+          fLayer->add_to_global_learning_rate(fIncreaseLRTerm);
+        }
+        else{}
+        if(classificationRate>fTargetClassifRate)converged=true;
+        prevclassificationRate=classificationRate;
       }
 
+      else{//use cost minimization
+        cost=fLayer->get_cost();
+        if(cost>prevCost){
+          fLayer->multiply_global_learning_rate(fReduceLRFactor);
+        }
+        //If classification rate has not changed by more than 1%
+        else if(fabs(cost-prevCost)/cost <fCostChange){
+          fLayer->add_to_global_learning_rate(fIncreaseLRTerm);
+        }
+        else{}
+        if(cost<fTargetCost)converged=true;
+        prevCost=cost;
+      }
+
+      //Print progress
+      if(i % (fnMaxEpoch/20)==0){
+        cout<<"Epoch "<<i<<" of "<<fnMaxEpoch<<" ";
+        if(fTargetCost>-1.0){
+          cout<<"cost: "<<cost<<endl;
+        }
+        else{
+          cout<<"classif rate: "<<classificationRate<<endl;
+        }
+      }
+
+      /*
       //!!Make decisions to optimize the learning or stop training (mutually exclusive optimizations)
       //decrease learning rate if classification and cost got worse
       if(classificationRate<prevclassificationRate || cost>prevCost){
@@ -107,7 +152,7 @@ void LayerTrainer::train_mini_batches(TR3 &aTraining, const TR3 &aValidation,
       else{}
       if(classificationRate>fTargetClassifRate)converged=true;
       prevclassificationRate=classificationRate;
-      prevCost=cost;
+      prevCost=cost; */
 
     }
     ntraining++;
