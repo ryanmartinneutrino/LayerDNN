@@ -1,7 +1,7 @@
 
 #Specific to this project#
 ###################
-Makefile
+#Makefile
 obj\
 vlg_trained.dat
 
