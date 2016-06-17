@@ -48,6 +48,7 @@ void LayerTrainer::one_epoch_mini_batches(TR3 &aXY, counter_t anPerBatch)
 
     fLayer->forward_pass(aXY[0],start,nperbatch);
     fLayer->backprop_pass(aXY[1],start,nperbatch);
+    //cout<<"about to update weights "<<ibatch<<" "<<nbatch<<endl;
     fLayer->update_weights();
   }
 }
@@ -79,14 +80,16 @@ void LayerTrainer::train_mini_batches(TR3 &aTraining, const TR3 &aValidation,
 
   counter_t nweight_updates_perset=1;//number of weight updates after looping through the data once (1=full batch)
   if(anPerBatch!=0)nweight_updates_perset=ndata/anPerBatch;
-  counter_t update_learning_period=20/nweight_updates_perset;//weight until at least 100 weight updates before calculating cost and evaluating performance
+  counter_t update_learning_period=100;//20/nweight_updates_perset;//weight until at least 100 weight updates before calculating cost and evaluating performance
   bool converged=false;
 
   for(counter_t i=0;i<fnMaxEpoch && !converged ;i++){
-
+    
     one_epoch_mini_batches(aTraining,anPerBatch);
+    
     //how often to update the learning rate
     if( (i % update_learning_period) ==0){
+      
       //run on validation data
       fLayer->forward_pass(aValidation[0]);
       fLayer->copy_targets(aValidation[1]);
@@ -107,7 +110,6 @@ void LayerTrainer::train_mini_batches(TR3 &aTraining, const TR3 &aValidation,
         if(classificationRate>fTargetClassifRate)converged=true;
         prevclassificationRate=classificationRate;
       }
-
       else{//use cost minimization
         cost=fLayer->get_cost();
         if(cost>prevCost){
@@ -121,7 +123,7 @@ void LayerTrainer::train_mini_batches(TR3 &aTraining, const TR3 &aValidation,
         if(cost<fTargetCost)converged=true;
         prevCost=cost;
       }
-
+      
       //Print progress
       if(i % (fnMaxEpoch/20)==0){
         cout<<"Epoch "<<i<<" of "<<fnMaxEpoch<<" ";
@@ -154,7 +156,7 @@ void LayerTrainer::train_mini_batches(TR3 &aTraining, const TR3 &aValidation,
       prevclassificationRate=classificationRate;
       prevCost=cost; */
 
-    }
+    }     
     ntraining++;
   }
   //One more run on the test data
